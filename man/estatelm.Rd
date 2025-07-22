@@ -4,7 +4,14 @@
 \alias{estatelm}
 \title{Fitting estate avaliation Linear Models}
 \usage{
-estatelm(formula, data, subset = NULL, ...)
+estatelm(
+  formula,
+  data,
+  subset = NULL,
+  transf = NULL,
+  mode = c("rural", "urban"),
+  ...
+)
 }
 \arguments{
 \item{formula}{an object of class "formula" (or one that

@@ -11,13 +11,15 @@ equation <- function(object, ...) {
   transf <- object$transf
   call <- match.call()
   mf <- model.frame(object)
-  mm <- model.matrix(modelo)
+  mm <- model.matrix(object)
   allVars_names <- names(object$dataOrigin)
   att <- attributes(object$terms)
   labels <- att$variables
-  response_name <- labels[[2]]
+  response_name <- as.character(labels[[2]])
   indepTerms_names <- colnames(mm)
-  indepTerms_names <- indepTerms_names[indepTerms_names != "(Intercept)"]
+  indepTerms_names <- as.character(indepTerms_names[
+    indepTerms_names != "(Intercept)"
+  ])
   coef <- coefficients(object)
   coef_ <- vector(length = length(coef))
 
@@ -73,14 +75,11 @@ equation <- function(object, ...) {
             "I" = n,
             "x" = n,
             "y" = n,
-            "1/x" = paste0("1 / ", n),
-            "1/y" = paste0("1 / ", n),
-            "lnx" = paste0("ln(", n, ")"),
-            "lny" = paste0("ln(", n, ")"),
-            "x2" = paste0(n, "²"),
-            "y2" = paste0(n, "²"),
-            "x3" = paste0(n, "³"),
-            "y3" = paste0(n, "³"),
+            "inverso" = paste0("1 / ", n),
+            "log" = paste0("ln(", n, ")"),
+            "log10" = paste0("log10(", n, ")"),
+            "quadrado" = paste0(n, "²"),
+            "cubo" = paste0(n, "³"),
             # caso padrão
             paste0("transf(", t, ")(", n, ")")
           )

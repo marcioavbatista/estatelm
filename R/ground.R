@@ -8,7 +8,7 @@ ground <- function(
 ) {
   char <- match.arg(char)
   id <- match.arg(id)
-
+  mm <- as.data.frame(model.matrix(formula(object), object$dataOrigin)[, -1])
   mf <- model.frame(object)[, 2:ncol(model.frame(object))]
   allVars_names <- names(object$dataOrigin)
   att <- attributes(object$terms)
@@ -17,8 +17,13 @@ ground <- function(
   allVars_num <- length(allVars_names)
   usedVars_num <- length(usedVars_names) + 1
   allObs_num <- nrow(object$dataOrigin)
-  usedObs_num <- nrow(mf)
+  usedObs_num <- nrow(mm)
   mode <- object$mode
+
+  newdata <- as.data.frame(model.matrix(
+    update(formula(object), NULL ~ .),
+    newdata
+  )[, -1, drop = FALSE])
 
   groundVector <- matrix(0, nrow = nrow(newdata), ncol = 6)
 
@@ -53,17 +58,17 @@ ground <- function(
     ifelse(x > max(v_ref), 1, ifelse(x < min(v_ref), -1, 0))
   }
 
-  esc_aux <- matrix(0, nrow = nrow(newdata), ncol = ncol(mf))
-  newdata_aux <- matrix(0, nrow = nrow(newdata), ncol = ncol(mf))
-  colnames(esc_aux) <- colnames(mf)
-  colnames(newdata_aux) <- colnames(mf)
+  esc_aux <- matrix(0, nrow = nrow(newdata), ncol = ncol(mm))
+  newdata_aux <- matrix(0, nrow = nrow(newdata), ncol = ncol(mm))
+  colnames(esc_aux) <- colnames(mm)
+  colnames(newdata_aux) <- colnames(mm)
 
   for (j in 1:nrow(newdata)) {
     new <- newdata[j, ]
 
-    for (i in colnames(mf)) {
-      vet_aux <- mf[[i]]
-      idx <- which(colnames(mf) == i)
+    for (i in colnames(mm)) {
+      vet_aux <- as.numeric(mm[[i]])
+      idx <- which(colnames(mm) == i)
       val <- as.numeric(new[[i]])
 
       if (is.numeric(vet_aux)) {
@@ -77,10 +82,10 @@ ground <- function(
       groundVector[j, 4] <- 3
     } else {
       extrapolou <- FALSE
-      for (i in colnames(mf)) {
-        idx <- which(colnames(mf) == i)
+      for (i in colnames(mm)) {
+        idx <- which(colnames(mm) == i)
         val <- as.numeric(new[[i]])
-        vet_ref <- mf[[i]]
+        vet_ref <- as.numeric(mm[[i]])
 
         if (esc_aux[j, idx] == 0) {
           newdata_aux[j, idx] <- val
@@ -170,5 +175,5 @@ ground <- function(
     )
   }
 
-  return(list(aux = aux, detail = groundVector))
+  return(list(aux = aux, detail = groundVector, newdata, esc_aux))
 }

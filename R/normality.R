@@ -2,7 +2,7 @@
 qme <- function(object, ...) {
   res <- residuals(object)
   n <- length(res)
-  p <- length(modelo$coefficients)
+  p <- length(object$coefficients)
 
   sqe <- sum(res^2)
   qme <- sqe / (n - p)
@@ -12,7 +12,7 @@ qme <- function(object, ...) {
 #'@export
 normality_table <- function(object, ...) {
   res <- residuals(object)
-  qme <- qme(object)
+  qme <- sqrt(qme(object))
   std_residuals <- res / qme
 
   prop_entre_1 <- sum(std_residuals >= -1 & std_residuals <= 1) /

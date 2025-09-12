@@ -1,16 +1,16 @@
 #'@export
 corlm_ <- function(object, type = c("std", "inf"), ...) {
   type <- match.arg(type)
-
-  df <- object$dataOrigin
+  mf <- model.frame(object)
   modelMatrix <- model.matrix(object)
+  modelMatrix <- subset(modelMatrix, select = -`(Intercept)`)
   att <- attributes(object$terms)
   labels <- att$variables
-  usedVars_names <- with(att, term.labels)
+  usedVars_names <- colnames(modelMatrix)
 
   y_ <- as.character(labels[[2]])
+  df <- cbind(modelMatrix, mf[y_])
   varsUti <- c(usedVars_names, y_)
-  df <- df[, varsUti]
 
   alias <- c(paste0("x", (1:length(usedVars_names))), "y")
 
@@ -25,6 +25,7 @@ corlm_ <- function(object, type = c("std", "inf"), ...) {
   cor_matrix <- cbind(varsUti, alias, cor_matrix)
 
   colnames(cor_matrix) <- c("Variáveis", "Alias", alias)
+  rownames(cor_matrix) <- NULL
 
   return(cor_matrix)
 }
@@ -34,23 +35,26 @@ cor.aux <- function(x, y) {
   classx <- class(x)
   classy <- class(y)
 
-  if (classx == "numeric" && classy == "numeric") {
+  if (is.numeric(x) && is.numeric(y)) {
     return(cor(x, y))
-  } else if (classx == "factor" && classy == "numeric") {
+  } else if (classx == "factor" && is.numeric(y)) {
     mod <- aov(y ~ x, data = data.frame(x, y))
     return(effectsize::eta_squared(mod, verbose = F)[[2]])
-  } else if (classx == "numeric" && classy == "factor") {
+  } else if (is.numeric(x) && classy == "factor") {
     mod <- aov(x ~ y, data = data.frame(x, y))
     return(effectsize::eta_squared(mod, verbose = F)[[2]])
   } else if (classx == "factor" && classy == "factor") {
     tabela <- table(x, y)
     invisible(rcompanion::cramerV(tabela))
+  } else {
+    return(1)
   }
 }
 
 #'@export
 corlm <- function(object, ...) {
-  df <- object$dataOrigin
+  mf <- model.frame(object)
+
   modelMatrix <- model.matrix(object)
   att <- attributes(object$terms)
   labels <- att$variables
@@ -58,18 +62,18 @@ corlm <- function(object, ...) {
 
   y_ <- as.character(labels[[2]])
   varsUti <- c(usedVars_names, y_)
-  df <- df[, varsUti]
+  mf <- mf[, varsUti]
 
   alias <- c(paste0("x", (1:length(usedVars_names))), "y")
 
-  colnames(df) <- alias
+  colnames(mf) <- alias
 
-  n <- ncol(df)
+  n <- ncol(mf)
   tb <- matrix(0, n, n)
 
   for (i in 1:n) {
     for (j in 1:n) {
-      tb[i, j] <- cor.aux(df[[i]], df[[j]])
+      tb[i, j] <- as.numeric(cor.aux(mf[[i]], mf[[j]]))
     }
   }
 

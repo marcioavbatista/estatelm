@@ -1,11 +1,12 @@
 #' @export
 anovaModel <- function(object) {
+  class(object) <- "lm"
   anova <- car::Anova(object)
 
   allVars_names <- names(object$dataOrigin)
   att <- attributes(object$terms)
   labels <- att$variables
-  usedVars_names <- with(att, term.labels[order == 1])
+  usedVars_names <- with(att, term.labels)
 
   sq_ <- anova[[1]]
   gl_ <- anova[[2]]

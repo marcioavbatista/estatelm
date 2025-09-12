@@ -25,6 +25,6 @@ readAvaliation <- function(file) {
   }
 
   out_df <- as.data.frame(out_df)
-  clas(out_df) <- c("estate.data.frame", "data.frame")
+  class(out_df) <- c("estate.data.frame", "data.frame")
   return(out_df)
 }

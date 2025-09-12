@@ -27,7 +27,7 @@ predict.estatelm <- function(
 
         newdata <- transformar_df(
             newdata,
-            transf[-which(names(df) == response_name)]
+            transf[names(newdata)]
         )
     }
 
@@ -100,7 +100,7 @@ predict.estatelm <- function(
             (pred_aux[3] - pred_aux[1]) / pred_aux[1]
         )
 
-        ampSum <- sum(amp)
+        ampSum <- sum(abs(amp))
 
         if (mode == "rural") {
             if (ampSum <= 0.3) {

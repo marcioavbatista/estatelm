@@ -40,11 +40,11 @@ print.white.test <- function(x, ...) {
 }
 
 #'@export
-summary.white.test <- function(x, ...) {
+summary.white.test <- function(object, ...) {
   tb <- data.frame(
-    "Estatística do teste de White:" = x$stat,
-    "Graus de liberdade:" = x$df,
-    "p-valor:" = x$p.value
+    "Estatística do teste de White:" = object$stat,
+    "Graus de liberdade:" = object$df,
+    "p-valor:" = object$p.value
   )
   return(tb)
 }

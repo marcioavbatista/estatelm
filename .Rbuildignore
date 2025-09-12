@@ -1,2 +1,4 @@
 ^estatelm\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
+^dev$
